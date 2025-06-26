@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<title>Poop Adventure 2</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="A fun game where you dodge falling poops! Avoid the poops to score points.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#10B981">
+
+<!-- Open Graph Meta Tags -->
+<meta property="og:title" content="Poop Adventure 2">
+<meta property="og:description" content="A fun game where you dodge falling poops! Avoid the poops to score points.">
+<meta property="og:image" content="icon_512x512.png">
+<meta property="og:url" content="https://js48jjw.github.io/Poop2/">
+<meta property="og:type" content="game">
+
+<!-- Manifest for PWA -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon_192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon_512x512.png">
+<link rel="apple-touch-icon" href="icon_192x192.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        font-family: 'Noto Sans KR', sans-serif;
+        overflow: hidden;
+        touch-action: none;
+    }
+    #gameContainer {
+        text-align: center;
+        position: relative;
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        padding: 0 5px;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        width: 95vw;
+        max-width: 640px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    #gameContainer:hover {
+        transform: translate(-50%, -50%) scale(1.02);
+    }
+    #gameCanvas {
+        display: block;
+        margin: 10px auto 0 auto;
+        width: 100%;
+        max-width: 600px;
+        border-radius: 20px;
+        border: 4px solid #2c3e50;
+        background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+        display: none;
+        height: auto;
+        max-height: auto;
+        touch-action: manipulation;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    #controls {
+        margin-top: 0;
+        padding: 15px 0;
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 14px;
+        text-align: center;
+        position: relative;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    .arrowButton {
+        width: 20px;
+        height: 50px;
+        bottom: 15px;
+        border-radius: 12px;
+        box-shadow: 2px 2px 6px #babecc, -2px -2px 6px #ffffff;
+        background: linear-gradient(135deg, #e0e5ec 0%, #f9f9f9 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        z-index: 12;
+        cursor: pointer;
+    }
+    .arrowButton:hover {
+        background: linear-gradient(135deg, #d1d9e6 0%, #f1f3f6 100%);
+        box-shadow: 3px 3px 9px #babecc, -3px -3px 9px #ffffff;
+        transform: translateY(-2px);
+    }
+    .arrowButton:active {
+        background: linear-gradient(135deg, #c5d0e0 0%, #e8ecf1 100%);
+        box-shadow: 1px 1px 3px #babecc, -1px -1px 3px #ffffff;
+        transform: translateY(1px);
+    }
+    .arrowButton svg {
+        width: 30px;
+        height: 30px;
+        fill: #4f8cff;
+        filter: drop-shadow(0 0.5px 1px rgba(0,0,0,0.1));
+    }
+    .arrowButton::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 90%;
+        height: 90%;
+        border-radius: 12px;
+        background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 100%);
+        pointer-events: none;
+    }
+    #leftArrow {
+        left: 5px;
+    }
+    #rightArrow {
+        right: 5px;
+    }
+    button {
+        padding: 15px 30px;
+        font-size: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 20px;
+        border-radius: 15px;
+        border: none;
+        background: linear-gradient(90deg, #2ecc71, #27ae60);
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        touch-action: manipulation;
+        min-width: 150px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    button:hover {
+        background: linear-gradient(90deg, #27ae60, #219a52);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+    }
+    button:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    #scoreBoard {
+        position: absolute;
+        top: 20px;
+        left: 19px;
+        font-size: 30px;
+        font-weight: 700;
+        color: #2c3e50;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 6px 10px;
+        border-radius: 10px;
+        display: none;
+        z-index: 5;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        border: 1.5px solid #3498db;
+    }
+    #highScoreSection {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        padding: 20px;
+        border-radius: 20px;
+        text-align: center;
+        font-size: 16px;
+        border: 2px solid #3498db;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        z-index: 16;
+        max-width: 200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    #highScoreSection h3 {
+        margin: 0 0 12px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #2ecc71;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    #highScoreDate {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #34495e;
+        font-size: 14px;
+    }
+    #topScoresList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    #topScoresList li {
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 5px;
+        background: rgba(52, 152, 219, 0.1);
+        border-radius: 8px;
+    }
+    #startScreen, #gameOverScreen {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, rgba(44, 62, 80, 0.95), rgba(52, 73, 94, 0.95));
+        color: white;
+        padding: 40px;
+        border-radius: 25px;
+        text-align: center;
+        font-size: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        z-index: 15;
+        width: 85%;
+        max-width: 500px;
+        transition: opacity 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    #startScreen h2, #gameOverScreen h2 {
+        margin: 15px 0;
+        font-size: 42px;
+        font-weight: 700;
+        color: #2ecc71;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    #startScreen p, #gameOverScreen p {
+        margin: 0 0 25px;
+        color: #ecf0f1;
+        font-size: 18px;
+        line-height: 1.6;
+    }
+    @media (max-width: 600px) {
+        #gameContainer {
+            padding: 0 5px;
+            border-radius: 16px;
+            margin: 0 auto;
+            width: 95vw;
+            max-width: 640px;
+        }
+        #gameCanvas {
+            max-height: calc(90vw * 1.5);
+            border-radius: 12px;
+            margin: 5px auto 0 auto;
+            border: 2px solid #2c3e50;
+        }
+        #controls {
+            margin-top: 0;
+            padding: 15px 0;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .arrowButton {
+            width: 10px;
+            height: 33px;
+            bottom: 8px;
+            border-radius: 12px;
+            box-shadow: 2px 2px 6px #babecc, -2px -2px 6px #ffffff;
+        }
+        .arrowButton:hover {
+            box-shadow: 3px 3px 9px #babecc, -3px -3px 9px #ffffff;
+        }
+        .arrowButton:active {
+            box-shadow: 1px 1px 3px #babecc, -1px -1px 3px #ffffff;
+        }
+        .arrowButton svg {
+            width: 25px;
+            height: 25px;
+            filter: drop-shadow(0 0.5px 1px rgba(0,0,0,0.1));
+        }
+        .arrowButton::after {
+            border-radius: 12px;
+        }
+        #leftArrow {
+            left: 5px;
+        }
+        #rightArrow {
+            right: 5px;
+        }
+        #moveDesc {
+            margin: 0;
+            padding: 0 8px;
+            font-size: 13px;
+        }
+        #startScreen h2, #gameOverScreen h2 {
+            font-size: 24px;
+        }
+        #startScreen p, #gameOverScreen p {
+            font-size: 12px;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            min-width: 80px;
+        }
+        #scoreBoard {
+            font-size: 14px;
+            padding: 6px 10px;
+            top: 8px;
+            left: 8px;
+            border-radius: 10px;
+            border: 1.5px solid #3498db;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        #highScoreSection {
+            padding: 12px;
+            max-width: 150px;
+        }
+        #highScoreSection h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        #highScoreDate, #topScoresList li {
+            font-size: 12px;
+            margin-bottom: 4px;
+            padding: 3px;
+        }
+    }
+</style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="scoreBoard">점수: 0</div>
+        <canvas id="gameCanvas"></canvas>
+        <div id="startScreen">
+            <h2>Poop Adventure 2</h2>
+            <p>방향키 (← →) 또는 화살표 버튼으로 이동하세요!</p>            
+            <button onclick="pressStartGame()">게임 시작</button>
+        </div>
+        <div id="gameOverScreen">
+            <div id="highScoreSection">
+                <h3>오늘의 TOP 3</h3>
+                <div id="highScoreDate">날짜: 2025-05-19</div>
+                <ul id="topScoresList">
+                    <li>1등 ---</li>
+                    <li>2등 ---</li>
+                    <li>3등 ---</li>
+                </ul>
+            </div>
+            <h2>게임 오버!</h2>
+            <p>최종 점수: <span id="finalScore">0</span></p>
+            <button onclick="pressRestartGame()">다시 시작</button>
+        </div>
+        <div id="controls">
+            <p id="moveDesc">이동: ← → (키보드 방향키), 화살표 버튼</p>
+            <button class="arrowButton" id="leftArrow">←</button>
+            <button class="arrowButton" id="rightArrow">→</button>
+        </div>
+    </div>
+<script>
+    // 서비스 워커 등록
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+        });
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreBoard = document.getElementById('scoreBoard');
+    const startScreen = document.getElementById('startScreen');
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const finalScoreDisplay = document.getElementById('finalScore');
+    const controlsDisplay = document.getElementById('controls');
+    const highScoreSection = document.getElementById('highScoreSection');
+    const highScoreDateDisplay = document.getElementById('highScoreDate');
+    const topScoresListDisplay = document.getElementById('topScoresList');
+    const leftArrow = document.getElementById('leftArrow');
+    const rightArrow = document.getElementById('rightArrow');
+
+    const maxCanvasWidth = 600;
+    const canvasWidth = Math.min(window.innerWidth * 0.9, maxCanvasWidth);
+    canvas.width = canvasWidth;
+    const baseHeight = canvasWidth * (window.innerWidth <= 600 ? 1.5 : 1.25);
+    canvas.height = Math.max(100, baseHeight - 100);
+
+    let score = 0;
+    let animationFrameId = null;
+    let gameRunning = false;
+
+    const playerWidth = window.innerWidth <= 600 ? canvasWidth * 0.1 : canvasWidth * 0.067;
+    const playerHeight = window.innerWidth <= 600 ? canvasWidth * 0.1 : canvasWidth * 0.067;
+    let playerX = (canvas.width - playerWidth) / 2;
+    const playerY = canvas.height - playerHeight - canvasWidth * 0.001;
+    const playerImage = new Image();
+    playerImage.src = 'face.png';
+    let playerMoveSpeed = canvasWidth * 0.005817;
+    let rightPressed = false;
+    let leftPressed = false;
+    const playerHitboxRatio = 0.67;
+    
+    // 졸라맨 애니메이션 변수
+    let stickmanAnimationFrame = 0;
+    const stickmanAnimationSpeed = 0.2;
+    let stickmanDirection = 1; // 1: 오른쪽, -1: 왼쪽
+
+    const poopSize = canvasWidth * 0.05;
+    const poopEmoji = '💩';
+    let poops = [];
+
+    const initialPoopFallSpeedY = canvasWidth * 0.00292;
+    let poopFallSpeedY = initialPoopFallSpeedY;
+    const initialPoopMaxSideSpeed = canvasWidth * 0.0025;
+    let poopMaxSideSpeed = initialPoopMaxSideSpeed;
+    const initialPoopSpawnInterval = 500;
+    let poopSpawnInterval = initialPoopSpawnInterval;
+    const difficultyIncreaseInterval = 10;
+    const poopSpeedIncreaseStep = canvasWidth * 0.000417;
+    const poopSpawnIntervalDecreaseStep = 50;
+    const maxPoopFallSpeedY = canvasWidth * 0.0133;
+    const maxPoopMaxSideSpeed = canvasWidth * 0.00833;
+    const minPoopSpawnInterval = 100;
+
+    let lastPoopSpawnTime = 0;
+    const poopHitboxRatio = 0.7;
+
+    let isDragging = false;
+    let dragOffsetX = 0;
+
+    let gameStartTime = 0;
+
+    // Enhanced water splash animation variables
+    let particles = [];
+    const particleCount = 200;
+    let splashAnimationFrameId = null;
+
+    // Audio setup for Cartoon Fart Sound
+    const poopSound = new Audio('poopSound.mp3');
+    // 배경음악 설정
+    const startBGM = new Audio('Start BGM.mp3');
+    const finishBGM = new Audio('Finish BGM.mp3');
+    
+    // 배경음악 반복 재생 설정
+    startBGM.loop = true;
+    finishBGM.loop = false;  // 게임오버 음악은 한 번만 재생
+
+    function createParticles() {
+        particles = [];
+        for (let i = 0; i < particleCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 10 + 5;
+            const size = Math.random() * 10 + 5;
+            const startX = canvas.width / 2 + (Math.random() - 0.5) * canvas.width * 0.3;
+            const startY = canvas.height / 2 + (Math.random() - 0.5) * canvas.height * 0.3;
+            particles.push({
+                x: startX,
+                y: startY,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - 2,
+                size: size,
+                life: 1,
+                decay: 0.015
+            });
+        }
+    }
+
+    function updateParticles() {
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.2;
+            p.life -= p.decay;
+            if (p.life <= 0 || p.y > canvas.height || p.x < 0 || p.x > canvas.width) {
+                particles.splice(i, 1);
+            }
+        }
+    }
+
+    function drawParticles() {
+        ctx.fillStyle = 'rgba(0, 150, 255, 0.9)';
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    function animateSplash() {
+        if (particles.length === 0) {
+            cancelAnimationFrame(splashAnimationFrameId);
+            splashAnimationFrameId = null;
+            canvas.style.display = 'none';
+            return;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        updateParticles();
+        drawParticles();
+        splashAnimationFrameId = requestAnimationFrame(animateSplash);
+    }
+
+    function getScoreStorageKeyAndDate() {
+        const now = new Date();
+        let year = now.getFullYear();
+        let month = now.getMonth() + 1;
+        let day = now.getDate();
+        const currentHour = now.getHours();
+        if (currentHour < 6) {
+            const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            year = yesterday.getFullYear();
+            month = yesterday.getMonth() + 1;
+            day = yesterday.getDate();
+        }
+        const dateString = `${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+        const displayDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        return { key: `poopGameHighScores_${dateString}`, displayDate: displayDate };
+    }
+
+    function loadHighScoresAndDisplay() {
+        const { key, displayDate } = getScoreStorageKeyAndDate();
+        highScoreDateDisplay.textContent = `날짜: ${displayDate}`;
+        let scores = JSON.parse(localStorage.getItem(key)) || [];
+        topScoresListDisplay.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+            topScoresListDisplay.innerHTML += `<li>${i + 1}등 ${scores[i] !== undefined ? scores[i] : '---'}</li>`;
+        }
+        return scores;
+    }
+
+    function saveHighScore(currentScore) {
+        const { key } = getScoreStorageKeyAndDate();
+        let scores = JSON.parse(localStorage.getItem(key)) || [];
+        scores.push(currentScore);
+        scores.sort((a, b) => b - a);
+        scores = scores.slice(0, 3);
+        localStorage.setItem(key, JSON.stringify(scores));
+        loadHighScoresAndDisplay();
+    }
+
+    function drawStickman(x, y, width, height) {
+        const centerX = x + width / 2;
+        const headY = y;
+        const bodyStartY = headY + height * 0.2;
+        const bodyLength = height * 0.32;
+        const legLength = height * 0.4;
+        const armLength = height * 0.3;
+        
+        const legSwing = Math.sin(stickmanAnimationFrame) * 0.4;
+        const armSwing = Math.sin(stickmanAnimationFrame + Math.PI) * 0.4;
+        const bodySwing = Math.sin(stickmanAnimationFrame * 0.5) * 0.1;
+        
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, bodyStartY);
+        ctx.quadraticCurveTo(
+            centerX + bodySwing * width * 0.2,
+            bodyStartY + bodyLength * 0.5,
+            centerX,
+            bodyStartY + bodyLength
+        );
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, bodyStartY + bodyLength);
+        ctx.quadraticCurveTo(
+            centerX - width * 0.3,
+            bodyStartY + bodyLength + legLength * legSwing,
+            centerX - width * 0.2,
+            bodyStartY + bodyLength + legLength * (0.5 + legSwing)
+        );
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, bodyStartY + bodyLength);
+        ctx.quadraticCurveTo(
+            centerX + width * 0.3,
+            bodyStartY + bodyLength - legLength * legSwing,
+            centerX + width * 0.2,
+            bodyStartY + bodyLength + legLength * (0.5 - legSwing)
+        );
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, bodyStartY + bodyLength * 0.2);
+        ctx.quadraticCurveTo(
+            centerX - width * 0.4,
+            bodyStartY + bodyLength * 0.2 + armLength * armSwing,
+            centerX - width * 0.3,
+            bodyStartY + bodyLength * 0.2 + armLength * (0.5 + armSwing)
+        );
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, bodyStartY + bodyLength * 0.2);
+        ctx.quadraticCurveTo(
+            centerX + width * 0.4,
+            bodyStartY + bodyLength * 0.2 - armLength * armSwing,
+            centerX + width * 0.3,
+            bodyStartY + bodyLength * 0.2 + armLength * (0.5 - armSwing)
+        );
+        ctx.stroke();
+    }
+
+    function drawPlayer() {
+        drawStickman(playerX, playerY, playerWidth, playerHeight);
+        
+        const isMobile = window.innerWidth <= 600;
+        const faceWidth = isMobile ? playerWidth * 1.3483635 : playerWidth * 1.2662892;
+        const faceHeight = isMobile ? playerHeight * 0.9145422 : playerHeight * 0.8441928;
+        const faceX = playerX + (playerWidth - faceWidth) / 2;
+        const faceY = playerY - faceHeight * (isMobile ? 0.46 : 0.45);
+        ctx.drawImage(playerImage, faceX, faceY, faceWidth, faceHeight);
+        
+        if (leftPressed || rightPressed) {
+            stickmanAnimationFrame += stickmanAnimationSpeed;
+            stickmanDirection = rightPressed ? 1 : -1;
+        } else {
+            stickmanAnimationFrame = 0;
+        }
+    }
+
+    function drawPoops() {
+        ctx.font = `${poopSize}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        poops.forEach(poop => {
+            ctx.fillText(poopEmoji, poop.x + poopSize / 2, poop.y + poopSize / 2);
+        });
+    }
+
+    function spawnPoop() {
+        const x = Math.random() * (canvas.width - poopSize);
+        const dx = (Math.random() - 0.5) * 2 * poopMaxSideSpeed;
+        poops.push({ x: x, y: 0, dx: dx, dy: poopFallSpeedY });
+    }
+
+    function updatePoops() {
+        const currentTime = Date.now();
+        if (gameRunning && currentTime - lastPoopSpawnTime > poopSpawnInterval) {
+            spawnPoop();
+            lastPoopSpawnTime = currentTime;
+        }
+        for (let i = poops.length - 1; i >= 0; i--) {
+            let poop = poops[i];
+            poop.y += poop.dy;
+            poop.x += poop.dx;
+            if (poop.x < 0 || poop.x + poopSize > canvas.width) {
+                poop.dx *= -1;
+                poop.x = Math.max(0, Math.min(poop.x, canvas.width - poopSize));
+            }
+            const pEffWidth = playerWidth * playerHitboxRatio;
+            const pEffHeight = playerHeight * playerHitboxRatio;
+            const pColX1 = playerX + (playerWidth - pEffWidth) / 2;
+            const pColY1 = playerY + (playerHeight - pEffHeight) / 2;
+            const pColX2 = pColX1 + pEffWidth;
+            const pColY2 = pColY1 + pEffHeight;
+            const mEffSize = poopSize * poopHitboxRatio;
+            const mColX1 = poop.x + (poopSize - mEffSize) / 2;
+            const mColY1 = poop.y + (poopSize - mEffSize) / 2;
+            const mColX2 = mColX1 + mEffSize;
+            const mColY2 = mColY1 + mEffSize;
+            if (pColX1 < mColX2 && pColX2 > mColX1 && pColY1 < mColY2 && pColY2 > mColY1) {
+                triggerGameOver();
+                return;
+            }
+            if (poop.y > canvas.height) {
+                poops.splice(i, 1);
+                score++;
+                scoreBoard.textContent = `점수: ${score}`;
+                if (score % 10 === 0 && score > 0) {
+                    poopSound.currentTime = 0;
+                    poopSound.play().catch(error => console.log("Poop sound play failed:", error));
+                }
+                if (score > 0 && score % difficultyIncreaseInterval === 0) {
+                    poopFallSpeedY = Math.min(maxPoopFallSpeedY, poopFallSpeedY + poopSpeedIncreaseStep);
+                    poopMaxSideSpeed = Math.min(maxPoopMaxSideSpeed, poopMaxSideSpeed + poopSpeedIncreaseStep);
+                    poopSpawnInterval = Math.max(minPoopSpawnInterval, poopSpawnInterval - poopSpawnIntervalDecreaseStep);
+                }
+            }
+        }
+    }
+
+    function updatePlayerPosition() {
+        if (leftPressed) {
+            playerX -= playerMoveSpeed;
+        }
+        if (rightPressed) {
+            playerX += playerMoveSpeed;
+        }
+        if (playerX < 0) playerX = 0;
+        if (playerX + playerWidth > canvas.width) {
+            playerX = canvas.width - playerWidth;
+        }
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function gameLoop() {
+        if (!gameRunning) {
+            animationFrameId = null;
+            return;
+        }
+        clearCanvas();
+        updatePlayerPosition();
+        drawPlayer();
+        updatePoops();
+        if (gameRunning) {
+            drawPoops();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        } else {
+            animationFrameId = null;
+        }
+    }
+
+    function triggerGameOver() {
+        gameRunning = false;
+        finalScoreDisplay.textContent = score;
+        saveHighScore(score);
+        gameOverScreen.style.display = 'flex';
+        canvas.style.display = 'block';
+        controlsDisplay.style.display = 'none';
+        scoreBoard.style.display = 'none';
+        leftArrow.style.display = 'none';
+        rightArrow.style.display = 'none';
+        createParticles();
+        if (!splashAnimationFrameId) {
+            animateSplash();
+        }
+        startBGM.pause();
+        startBGM.currentTime = 0;
+        finishBGM.currentTime = 0;
+        finishBGM.play().catch(error => console.log("Finish BGM play failed:", error));
+    }
+
+    function setupNewRound() {
+        score = 0;
+        poops = [];
+        playerX = (canvas.width - playerWidth) / 2;
+        poopFallSpeedY = initialPoopFallSpeedY;
+        poopMaxSideSpeed = initialPoopMaxSideSpeed;
+        poopSpawnInterval = initialPoopSpawnInterval;
+        scoreBoard.textContent = `점수: ${score}`;
+        rightPressed = false;
+        leftPressed = false;
+        gameStartTime = Date.now();
+        lastPoopSpawnTime = gameStartTime - poopSpawnInterval + 1000;
+    }
+
+    window.pressStartGame = function() {
+        if (gameRunning) return;
+        startScreen.style.display = 'none';
+        gameOverScreen.style.display = 'none';
+        canvas.style.display = 'block';
+        controlsDisplay.style.display = 'block';
+        scoreBoard.style.display = 'block';
+        leftArrow.style.display = 'flex';
+        rightArrow.style.display = 'flex';
+        setupNewRound();
+        gameRunning = true;
+        if (animationFrameId === null) {
+            gameLoop();
+        }
+        finishBGM.pause();
+        finishBGM.currentTime = 0;
+        startBGM.currentTime = 0;
+        startBGM.play().catch(error => console.log("Start BGM play failed:", error));
+    }
+
+    window.pressRestartGame = function() {
+        gameOverScreen.style.display = 'none';
+        canvas.style.display = 'block';
+        controlsDisplay.style.display = 'block';
+        scoreBoard.style.display = 'block';
+        leftArrow.style.display = 'flex';
+        rightArrow.style.display = 'flex';
+        if (splashAnimationFrameId) {
+            cancelAnimationFrame(splashAnimationFrameId);
+            splashAnimationFrameId = null;
+            particles = [];
+        }
+        setupNewRound();
+        gameRunning = true;
+        if (animationFrameId === null) {
+            gameLoop();
+        }
+        finishBGM.pause();
+        finishBGM.currentTime = 0;
+        startBGM.currentTime = 0;
+        startBGM.play().catch(error => console.log("Start BGM play failed:", error));
+    }
+
+    function initializeView() {
+        startScreen.style.display = 'block';
+        canvas.style.display = 'none';
+        controlsDisplay.style.display = 'none';
+        scoreBoard.style.display = 'none';
+        gameOverScreen.style.display = 'none';
+        leftArrow.style.display = 'none';
+        rightArrow.style.display = 'none';
+        loadHighScoresAndDisplay();
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (!gameRunning && startScreen.style.display === 'block') {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                pressStartGame();
+            }
+        } else if (!gameRunning && gameOverScreen.style.display === 'flex') {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                pressRestartGame();
+            }
+        }
+        if (gameRunning) {
+            if (e.key === 'ArrowRight') rightPressed = true;
+            else if (e.key === 'ArrowLeft') leftPressed = true;
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        if (gameRunning) {
+            if (e.key === 'ArrowRight') rightPressed = false;
+            else if (e.key === 'ArrowLeft') leftPressed = false;
+        }
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+        if (!gameRunning) return;
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        if (mouseX >= playerX && mouseX <= playerX + playerWidth && mouseY >= playerY && mouseY <= playerY + playerHeight) {
+            isDragging = true;
+            dragOffsetX = mouseX - playerX;
+        }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (isDragging && gameRunning) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            playerX = mouseX - dragOffsetX;
+            if (playerX < 0) playerX = 0;
+            if (playerX + playerWidth > canvas.width) playerX = canvas.width - playerWidth;
+        }
+    });
+
+    canvas.addEventListener('mouseup', () => { isDragging = false; });
+    canvas.addEventListener('mouseleave', () => { isDragging = false; });
+
+    canvas.addEventListener('touchstart', (e) => {
+        if (!gameRunning) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const touchX = touch.clientX - rect.left;
+        const touchY = touch.clientY - rect.top;
+        if (touchX >= playerX && touchX <= playerX + playerWidth && touchY >= playerY && touchY <= playerY + playerHeight) {
+            isDragging = true;
+            dragOffsetX = touchX - playerX;
+        }
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+        if (isDragging && gameRunning) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const touchX = touch.clientX - rect.left;
+            playerX = touchX - dragOffsetX;
+            if (playerX < 0) playerX = 0;
+            if (playerX + playerWidth > canvas.width) playerX = canvas.width - playerWidth;
+        }
+    });
+
+    canvas.addEventListener('touchend', () => { isDragging = false; });
+
+    leftArrow.addEventListener('mousedown', () => { if (gameRunning) leftPressed = true; });
+    leftArrow.addEventListener('mouseup', () => { leftPressed = false; });
+    rightArrow.addEventListener('mousedown', () => { if (gameRunning) rightPressed = true; });
+    rightArrow.addEventListener('mouseup', () => { rightPressed = false; });
+
+    leftArrow.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (gameRunning) leftPressed = true;
+    });
+    leftArrow.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        leftPressed = false;
+    });
+    rightArrow.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (gameRunning) rightPressed = true;
+    });
+    rightArrow.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        rightPressed = false;
+    });
+
+    leftArrow.innerHTML = `<svg viewBox="0 0 24 24">
+        <path d="M 16 6 L 14 6 L 9 12 L 14 18 L 16 18 L 11 12 Z"/>
+    </svg>`;
+    rightArrow.innerHTML = `<svg viewBox="0 0 24 24">
+        <path d="M 8 6 L 10 6 L 15 12 L 10 18 L 8 18 L 13 12 Z"/>
+    </svg>`;
+
+    // 모바일에서만 설명글을 '무브무브!!'로 변경
+    if (window.innerWidth <= 600) {
+        const moveDesc = document.getElementById('moveDesc');
+        if (moveDesc) moveDesc.textContent = '무브무브!!';
+    }
+
+    window.onload = initializeView;
+</script>
+</body>
+</html>
