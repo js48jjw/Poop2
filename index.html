@@ -435,7 +435,7 @@
     const playerY = canvas.height - playerHeight - canvasWidth * 0.001;
     const playerImage = new Image();
     playerImage.src = 'face.png';
-    let playerMoveSpeed = canvasWidth * 0.005817;
+    let playerMoveSpeed = canvasWidth * 0.006817;
     let rightPressed = false;
     let leftPressed = false;
     const playerHitboxRatio = 0.67;
@@ -458,9 +458,9 @@
     const difficultyIncreaseInterval = 10;
     const poopSpeedIncreaseStep = canvasWidth * 0.000417;
     const poopSpawnIntervalDecreaseStep = 50;
-    const maxPoopFallSpeedY = canvasWidth * 0.0133;
-    const maxPoopMaxSideSpeed = canvasWidth * 0.00833;
-    const minPoopSpawnInterval = 100;
+    const maxPoopFallSpeedY = canvasWidth * 0.0233;
+    const maxPoopMaxSideSpeed = canvasWidth * 0.00933;
+    const minPoopSpawnInterval = 10;
 
     let lastPoopSpawnTime = 0;
     const poopHitboxRatio = 0.7;
