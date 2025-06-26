@@ -344,6 +344,25 @@
 </style>
 </head>
 <body>
+    <div id="adfit-top" style="width:100%;text-align:center;position:fixed;top:0;left:0;z-index:9999;background:transparent;">
+        <ins class="kakao_ad_area" style="display:block;margin:0 auto;" data-ad-unit="DAN-NjjBY4wAF1rfFUZU" data-ad-width="320" data-ad-height="50" data-ad-onfail="adTopNoAdCallback"></ins>
+    </div>
+    <div id="adfit-bottom" style="width:100%;text-align:center;position:fixed;bottom:0;left:0;z-index:9999;background:transparent;">
+        <ins class="kakao_ad_area" style="display:block;margin:0 auto;" data-ad-unit="DAN-2JImfbI2JqiYWG5v" data-ad-width="320" data-ad-height="50" data-ad-onfail="adBottomNoAdCallback"></ins>
+    </div>
+    <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+    <script type="text/javascript">
+      function adTopNoAdCallback(arg1) {
+        // 상단 광고가 없을 때 광고 영역 숨김
+        var topDiv = document.getElementById('adfit-top');
+        if (topDiv) topDiv.style.display = 'none';
+      }
+      function adBottomNoAdCallback(arg1) {
+        // 하단 광고가 없을 때 광고 영역 숨김
+        var bottomDiv = document.getElementById('adfit-bottom');
+        if (bottomDiv) bottomDiv.style.display = 'none';
+      }
+    </script>
     <div id="gameContainer">
         <div id="scoreBoard">점수: 0</div>
         <canvas id="gameCanvas"></canvas>
