@@ -307,7 +307,7 @@
             font-size: 13px;
         }
         #startScreen h2, #gameOverScreen h2 {
-            font-size: 18px;
+            font-size: 26px;
             white-space: nowrap;
         }
         #startScreen p, #gameOverScreen p {
@@ -402,7 +402,7 @@
     const maxCanvasWidth = 600;
     const canvasWidth = Math.min(window.innerWidth * 0.9, maxCanvasWidth);
     canvas.width = canvasWidth;
-    const baseHeight = canvasWidth * (window.innerWidth <= 600 ? 1.5 : 1.25);
+    const baseHeight = canvasWidth * (window.innerWidth <= 600 ? 1.7 : 1.25);
     canvas.height = Math.max(100, baseHeight - 100);
 
     let score = 0;
