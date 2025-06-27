@@ -578,7 +578,7 @@
         loadHighScoresAndDisplay();
     }
 
-    function drawStickman(x, y, width, height) {
+    function drawStickman(x, y, width, height, isDarkMode) {
         const centerX = x + width / 2;
         const headY = y;
         const bodyStartY = headY + height * 0.2;
@@ -590,8 +590,6 @@
         const armSwing = Math.sin(stickmanAnimationFrame + Math.PI) * 0.4;
         const bodySwing = Math.sin(stickmanAnimationFrame * 0.5) * 0.1;
         
-        // 다크모드 감지
-        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         ctx.strokeStyle = isDarkMode ? '#ffffff' : '#000000';
         ctx.lineWidth = 2;
         
@@ -647,7 +645,9 @@
     }
 
     function drawPlayer() {
-        drawStickman(playerX, playerY, playerWidth, playerHeight);
+        // 다크모드 감지 (drawPlayer에서 한 번만)
+        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        drawStickman(playerX, playerY, playerWidth, playerHeight, isDarkMode);
         
         const isMobile = window.innerWidth <= 600;
         const faceWidth = isMobile ? playerWidth * 1.3483635 : playerWidth * 1.2662892;
