@@ -485,6 +485,24 @@
     startBGM.loop = true;
     finishBGM.loop = false;  // 게임오버 음악은 한 번만 재생
 
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function handleColorSchemeChange(e) {
+        if (e.matches) {
+            // 다크모드로 바뀜
+            console.log('다크모드!');
+        } else {
+            // 라이트모드로 바뀜
+            console.log('라이트모드!');
+        }
+    }
+
+    // 이벤트 리스너 등록
+    darkModeMediaQuery.addEventListener('change', handleColorSchemeChange);
+
+    // 현재 상태도 확인 가능
+    console.log('현재 다크모드?', darkModeMediaQuery.matches);
+
     function createParticles() {
         particles = [];
         for (let i = 0; i < particleCount; i++) {
@@ -579,6 +597,8 @@
     }
 
     function drawStickman(x, y, width, height, isDarkMode) {
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
         const centerX = x + width / 2;
         const headY = y;
         const bodyStartY = headY + height * 0.2;
@@ -589,9 +609,6 @@
         const legSwing = Math.sin(stickmanAnimationFrame) * 0.4;
         const armSwing = Math.sin(stickmanAnimationFrame + Math.PI) * 0.4;
         const bodySwing = Math.sin(stickmanAnimationFrame * 0.5) * 0.1;
-        
-        ctx.strokeStyle = isDarkMode ? '#ffffff' : '#000000';
-        ctx.lineWidth = 2;
         
         ctx.beginPath();
         ctx.moveTo(centerX, bodyStartY);
